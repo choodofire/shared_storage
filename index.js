@@ -10,8 +10,7 @@ import {
     persistLock,
     pollLock,
     ensureLock,
-    pollLockList,
-    pollLockStreaming
+    pollLockList
 } from './handlers/handlers.js';
 
 const PORT = process.env.PORT || 50051;
@@ -35,7 +34,6 @@ async function bootstrap() {
             PersistLock: persistLock,
             PollLock: pollLock,
             PollLockList: pollLockList,
-            PollLockStreaming: pollLockStreaming,
             EnsureLock: ensureLock,
         });
 

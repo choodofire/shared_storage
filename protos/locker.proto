@@ -8,7 +8,6 @@ service LockService {
   rpc ExtendLock (LockRequest) returns (LockResponse) {}
   rpc PersistLock (LockRequest) returns (LockResponse) {}
   rpc PollLock (LockRequest) returns (PollResponse) {}
-  rpc PollLockStreaming (stream LockRequest) returns (stream PollResponse) {}
   rpc PollLockList (LockRequestList) returns (PollResponseList) {}
   rpc EnsureLock (LockRequest) returns (LockResponse) {}
 }
