@@ -30,7 +30,10 @@ export function pollLockList(call, callback) {
                 responses.push(response);
 
                 if (responses.length === pollRequests.length) {
-                    callback(null, { responses, isBlocked: isBlockedAll });
+                    callback(null, {
+                        responses,
+                        isBlocked: isBlockedAll
+                    });
                 }
             });
         });

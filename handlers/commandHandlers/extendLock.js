@@ -1,4 +1,5 @@
 import { getRedisClient } from '../../redis/redis-client.js';
+import { ticketStatus } from "../utils/ticketStatus.js";
 
 const redisClient = getRedisClient();
 
@@ -18,8 +19,9 @@ export function extendLock(call, callback) {
                     isError: true,
                     lock: call.request,
                     timeSpent,
-                    message: 'Record is not blocked' });
-                return;
+                    message: ticketStatus.notLocked
+                });
+                return
             }
 
             const ticketInfo = JSON.parse(result);
@@ -31,8 +33,9 @@ export function extendLock(call, callback) {
                     isError: true,
                     lock: call.request,
                     timeSpent,
-                    message: 'You are not owner' });
-                return;
+                    message: ticketStatus.alreadyLockedAnotherOwner
+                });
+                return
             }
 
             // Change lifetime
@@ -44,7 +47,8 @@ export function extendLock(call, callback) {
                         isError: false,
                         lock: call.request,
                         timeSpent,
-                        message: 'Lifetime set successfully' });
+                        message: ticketStatus.successLock
+                    });
                 } else {
                     const timeSpent = Date.now() - start;
 
@@ -52,7 +56,8 @@ export function extendLock(call, callback) {
                         isError: true,
                         lock: call.request,
                         timeSpent,
-                        message: 'Extend error' });
+                        message: ticketStatus.error
+                    });
                 }
             });
         });
@@ -60,6 +65,6 @@ export function extendLock(call, callback) {
         console.error('extendLock Error');
         console.error(e.stack);
     }
-    
+
 
 }

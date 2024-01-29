@@ -1,4 +1,5 @@
 import { getRedisClient } from '../../redis/redis-client.js';
+import { ticketStatus } from "../utils/ticketStatus.js";
 
 const redisClient = getRedisClient();
 
@@ -9,39 +10,26 @@ export function persistLock(call, callback) {
         const { ticket, ...values } = call.request;
         delete values.lifetime;
 
-        // Check record is locked
-        redisClient.get(ticket, (err, result) => {
+        // Trying to set up persist lock
+        redisClient.set(ticket, JSON.stringify(values), 'NX', (err, result) => {
             if (result) {
+                const timeSpent = Date.now() - start;
+
+                callback(null, {
+                    isError: false,
+                    lock: call.request,
+                    timeSpent,
+                    message: ticketStatus.successLock
+                });
+            } else {
                 const timeSpent = Date.now() - start;
 
                 callback(null, {
                     isError: true,
                     lock: call.request,
                     timeSpent,
-                    message: 'Record is already blocked' });
-                return;
+                    message: ticketStatus.alreadyLocked });
             }
-
-            // Trying to set up persist lock
-            redisClient.set(ticket, JSON.stringify(values), 'NX', (err, result) => {
-                if (result) {
-                    const timeSpent = Date.now() - start;
-
-                    callback(null, {
-                        isError: false,
-                        lock: call.request,
-                        timeSpent,
-                        message: 'Persist lock was placed successfully' });
-                } else {
-                    const timeSpent = Date.now() - start;
-
-                    callback(null, {
-                        isError: true,
-                        lock: call.request,
-                        timeSpent,
-                        message: 'Record is already blocked' });
-                }
-            });
         });
     } catch (e) {
         console.error('persistLock Error');

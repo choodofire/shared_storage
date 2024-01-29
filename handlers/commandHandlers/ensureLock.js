@@ -1,4 +1,5 @@
 import { getRedisClient } from '../../redis/redis-client.js';
+import { ticketStatus } from "../utils/ticketStatus.js";
 
 const redisClient = getRedisClient();
 
@@ -23,8 +24,9 @@ export function ensureLock(call, callback) {
                         isError: true,
                         lock: call.request,
                         timeSpent,
-                        message: 'Record is already blocked by another owner' });
-                    return;
+                        message: ticketStatus.alreadyLockedAnotherOwner
+                    });
+                    return
                 }
 
                 // Trying to set up lock with same owner
@@ -37,7 +39,8 @@ export function ensureLock(call, callback) {
                             isError: false,
                             lock: call.request,
                             timeSpent,
-                            message: 'Lock was placed successfully with to your record'});
+                            message: ticketStatus.successLock
+                        });
                     } else {
                         const timeSpent = Date.now() - start;
 
@@ -45,7 +48,8 @@ export function ensureLock(call, callback) {
                             isError: true,
                             lock: call.request,
                             timeSpent,
-                            message: 'Error with ensureLock' });
+                            message: ticketStatus.error
+                        });
                     }
                 });
             } else {
@@ -58,10 +62,17 @@ export function ensureLock(call, callback) {
                             isError: false,
                             lock: call.request,
                             timeSpent,
-                            message: 'Lock was placed successfully' });
+                            message: ticketStatus.successLock
+                        });
                     } else {
-                        console.log('Im in recursion')
-                        ensureLock(call, callback)
+                        const timeSpent = Date.now() - start;
+
+                        callback(null, {
+                            isError: true,
+                            lock: call.request,
+                            timeSpent,
+                            message: ticketStatus.error
+                        });
                     }
                 });
             }

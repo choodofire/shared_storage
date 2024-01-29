@@ -1,4 +1,5 @@
 import { getRedisClient } from '../../redis/redis-client.js';
+import { ticketStatus } from "../utils/ticketStatus.js";
 
 const redisClient = getRedisClient();
 
@@ -17,8 +18,9 @@ export function releaseLock(call, callback) {
                     isError: true,
                     lock: call.request,
                     timeSpent,
-                    message: 'Record is not blocked' });
-                return;
+                    message: ticketStatus.notLocked
+                });
+                return
             }
 
             const ticketInfo = JSON.parse(result);
@@ -30,8 +32,9 @@ export function releaseLock(call, callback) {
                     isError: true,
                     lock: call.request,
                     timeSpent,
-                    message: 'You are not owner' });
-                return;
+                    message: ticketStatus.alreadyLockedAnotherOwner
+                });
+                return
             }
 
             // Unblock if record is locked
@@ -43,7 +46,8 @@ export function releaseLock(call, callback) {
                         isError: false,
                         lock: call.request,
                         timeSpent,
-                        message: 'Record unlocked successfully' });
+                        message: ticketStatus.successUnlock
+                    });
                 } else {
                     const timeSpent = Date.now() - start;
 
@@ -51,7 +55,8 @@ export function releaseLock(call, callback) {
                         isError: true,
                         lock: call.request,
                         timeSpent,
-                        message: 'Unlock error' });
+                        message: ticketStatus.error
+                    });
                 }
             });
         });
