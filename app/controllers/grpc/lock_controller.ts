@@ -9,7 +9,7 @@ import {
   pollLockListValidator,
   pollLockValidator,
   releaseLockValidator,
-} from '#validators/lock_request'
+} from '#validators/locks'
 import LockService from '#services/lock_service'
 import { PollResponse } from '#helpers/protos/generated/lockService/PollResponse'
 import { PollResponseList } from '#helpers/protos/generated/lockService/PollResponseList'

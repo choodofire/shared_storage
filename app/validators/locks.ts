@@ -1,13 +1,17 @@
 import vine from '@vinejs/vine'
 
+const ticketRules = () => vine.string().trim().uuid()
+const ownerRules = () => vine.string().trim()
+const lifetimeRules = () => vine.number()
+
 /**
  * Validates the acquire lock request
  */
 export const acquireLockValidator = vine.compile(
   vine.object({
-    ticket: vine.string().trim(),
-    owner: vine.string().trim(),
-    lifetime: vine.number(),
+    ticket: ticketRules(),
+    owner: ownerRules(),
+    lifetime: lifetimeRules(),
   })
 )
 
@@ -16,9 +20,9 @@ export const acquireLockValidator = vine.compile(
  */
 export const ensureLockValidator = vine.compile(
   vine.object({
-    ticket: vine.string().trim(),
-    owner: vine.string().trim(),
-    lifetime: vine.number(),
+    ticket: ticketRules(),
+    owner: ownerRules(),
+    lifetime: lifetimeRules(),
   })
 )
 
@@ -27,9 +31,9 @@ export const ensureLockValidator = vine.compile(
  */
 export const extendLockValidator = vine.compile(
   vine.object({
-    ticket: vine.string().trim(),
-    owner: vine.string().trim(),
-    lifetime: vine.number(),
+    ticket: ticketRules(),
+    owner: ownerRules(),
+    lifetime: lifetimeRules(),
   })
 )
 
@@ -38,8 +42,8 @@ export const extendLockValidator = vine.compile(
  */
 export const persistLockValidator = vine.compile(
   vine.object({
-    ticket: vine.string().trim(),
-    owner: vine.string().trim(),
+    ticket: ticketRules(),
+    owner: ownerRules(),
   })
 )
 
@@ -48,8 +52,8 @@ export const persistLockValidator = vine.compile(
  */
 export const pollLockValidator = vine.compile(
   vine.object({
-    ticket: vine.string().trim(),
-    owner: vine.string().trim(),
+    ticket: ticketRules(),
+    owner: ownerRules(),
   })
 )
 
@@ -58,8 +62,8 @@ export const pollLockValidator = vine.compile(
  */
 export const pollLockListValidator = vine.compile(
   vine.object({
-    tickets: vine.array(vine.string().trim()),
-    owner: vine.string().trim(),
+    tickets: vine.array(ticketRules()),
+    owner: ownerRules(),
   })
 )
 
@@ -68,7 +72,7 @@ export const pollLockListValidator = vine.compile(
  */
 export const releaseLockValidator = vine.compile(
   vine.object({
-    ticket: vine.string().trim(),
-    owner: vine.string().trim(),
+    ticket: ticketRules(),
+    owner: ownerRules(),
   })
 )

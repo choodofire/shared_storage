@@ -11,18 +11,14 @@ export default class UsersController {
       })
     }
 
-    const users = await User.query()
-    if (!users.length) {
-      return response.notFound({
-        errors: [{ code: 'E_ROW_NOT_FOUND', message: 'Object not found.' }],
-      })
-    }
+    const users = await User.query().paginate(
+      request.input('page', 1),
+      request.input('per_page', 100)
+    )
     return users
   }
 
   async store({ request, response, auth }: HttpContext) {
-    const auth_user = auth.use('api').user
-
     const payload = await createUserValidator.validate(request.all())
     const existingUser = await User.query().where('email', payload.email).first()
     if (existingUser) {
@@ -41,9 +37,7 @@ export default class UsersController {
     return response.created({ ...token, newUser })
   }
 
-  async show({ request, response, auth }: HttpContext) {
-    const auth_user = auth.use('api').user
-
+  async show({ request, response }: HttpContext) {
     const { id } = await idUserValidator.validate({ id: request.param('id') })
     const user = await User.query().where('id', id).first()
     if (!user) {
@@ -54,9 +48,7 @@ export default class UsersController {
     return user
   }
 
-  async update({ request, response, auth }: HttpContext) {
-    const auth_user = auth.use('api').user
-
+  async update({ request }: HttpContext) {
     const id = request.param('id')
     const payload = await updateUserValidator.validate(Object.assign(request.all(), { id }))
 
@@ -64,9 +56,7 @@ export default class UsersController {
     return user
   }
 
-  async destroy({ request, response, auth }: HttpContext) {
-    const auth_user = auth.use('api').user
-
+  async destroy({ request, response }: HttpContext) {
     const { id } = await idUserValidator.validate({ id: request.param('id') })
     const user = await User.query().where('id', id).first()
     if (!user) {

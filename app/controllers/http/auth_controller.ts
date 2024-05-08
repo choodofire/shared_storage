@@ -21,5 +21,15 @@ export default class AuthController {
     return { ...token, user }
   }
 
-  async logout({}: HttpContext) {}
+  async logout({ auth, response }: HttpContext) {
+    const authUser = auth.use('api').user
+    const token = authUser?.currentAccessToken.identifier
+    if (!token) {
+      return response.badRequest({
+        errors: [{ code: 'E_BAD_REQUEST', message: 'Auth is not correct' }]
+      })
+    }
+    await User.accessTokens.delete(authUser, token)
+    return response.ok({ message: 'Logged out' })
+  }
 }
