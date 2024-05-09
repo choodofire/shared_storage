@@ -1,6 +1,5 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
-import { HttpContext } from '@adonisjs/core/http'
 import { server_grpc } from '../bin/server_grpc.js'
 import env from '#start/env'
 const UsersController = () => import('#controllers/http/users_controller')
@@ -13,14 +12,9 @@ import swagger from '#config/swagger'
 const API = env.get('API')
 
 // returns swagger in YAML
-router.get('/api/swagger', async () => {
-  return AutoSwagger.default.docs(router.toJSON(), swagger)
-})
-
-// Renders Swagger-UI and passes YAML-output of /swagger
-router.get('/api/docs', async () => {
-  return AutoSwagger.default.ui('/swagger', swagger)
-})
+router.get('/swagger', async () => AutoSwagger.default.docs(router.toJSON(), swagger))
+// Renders Swagger-UI
+router.get('/docs', async () => AutoSwagger.default.ui('/swagger', swagger))
 
 switch (API) {
   case 'HTTP':
@@ -28,12 +22,8 @@ switch (API) {
       .group(() => {
         router.post('/login', [AuthController, 'login'])
         router.post('/logout', [AuthController, 'logout']).use(middleware.auth())
-        router.resource('/users', UsersController).use('*', middleware.auth())
-        router
-          .get('/me', async ({ auth }: HttpContext) => {
-            return auth.use('api').user
-          })
-          .use(middleware.auth())
+        router.get('/me', [AuthController, 'me']).use(middleware.auth())
+        router.resource('/users', UsersController).apiOnly().use('*', middleware.auth())
 
         router
           .resource('/locks', LocksController)

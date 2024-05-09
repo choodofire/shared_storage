@@ -4,12 +4,12 @@ import url from 'node:url'
 export default {
   // path: __dirname + "/../", for AdonisJS v5
   path: path.dirname(url.fileURLToPath(import.meta.url)) + '/../', // for AdonisJS v6
-  title: 'Foo', // use info instead
+  title: 'Shared Storage API', // use info instead
   version: '1.0.0', // use info instead
   description: '', // use info instead
   tagIndex: 2,
   info: {
-    title: 'title',
+    title: 'Shared Storage API',
     version: '1.0.0',
     description: '',
   },

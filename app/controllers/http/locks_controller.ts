@@ -67,6 +67,14 @@ export default class LocksController {
     }
   }
 
+  /**
+   * @show
+   * @summary Получение информации об одной блокировке
+   * @param id - b9945081-7283-4e3d-8431-1707ecc53994
+   * @responseBody 200 -
+   * @responseBody 401 - {"errors": [{"message": "Unauthorized access" }]}
+   * @responseBody 403 - {"errors": [{ "code": "E_ROW_NOT_FOUND", "message": "You can`t do it." }]}
+   */
   async show({ request, response, auth }: HttpContext) {
     const authUser = auth.use('api').user
     if (!authUser || authUser.role > 2) {
