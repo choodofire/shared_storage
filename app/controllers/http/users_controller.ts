@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { createUserValidator, idUserValidator, updateUserValidator } from '#validators/user'
 import User from '#models/user'
+import { userlogMethod } from '#helpers/decorators/userlog'
 
 export default class UsersController {
   /**
@@ -12,6 +13,7 @@ export default class UsersController {
    * @responseBody 401 - {"errors": [{"message": "Unauthorized access" }]}
    * @responseBody 403 - {"errors": [{ "code": "E_ROW_NOT_FOUND", "message": "You can`t do it." }]}
    */
+  @userlogMethod('User', '', 'id')
   async index({ request, response, auth }: HttpContext) {
     const authUser = auth.use('api').user
     if (!authUser || authUser.role > 2) {
@@ -62,6 +64,7 @@ export default class UsersController {
    * @responseBody 401 - {"errors": [{"message": "Unauthorized access" }]}
    * @responseBody 404 - {"errors": [{ "code": "E_ROW_NOT_FOUND", "message": "Object not found." }]}
    */
+  @userlogMethod('User', 'id')
   async show({ request, response }: HttpContext) {
     const { id } = await idUserValidator.validate({ id: request.param('id') })
     const user = await User.query().where('id', id).first()
@@ -80,6 +83,7 @@ export default class UsersController {
    * @responseBody 200 - <User>
    * @responseBody 401 - {"errors": [{"message": "Unauthorized access" }]}
    */
+  @userlogMethod('User', 'id')
   async update({ request }: HttpContext) {
     const id = request.param('id')
     const payload = await updateUserValidator.validate(Object.assign(request.all(), { id }))
@@ -96,6 +100,7 @@ export default class UsersController {
    * @responseBody 401 - {"errors": [{"message": "Unauthorized access" }]}
    * @responseBody 404 - {"errors": [{ "code": "E_ROW_NOT_FOUND", "message": "Object not found." }]}
    */
+  @userlogMethod('User', 'id')
   async destroy({ request, response }: HttpContext) {
     const { id } = await idUserValidator.validate({ id: request.param('id') })
     const user = await User.query().where('id', id).first()

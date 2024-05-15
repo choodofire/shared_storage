@@ -12,6 +12,7 @@ import {
 import { inject } from '@adonisjs/core'
 import LockService from '#services/lock_service'
 import { exhaustiveCheck } from '#helpers/exhaustive_check'
+import { userlogMethod } from '#helpers/decorators/userlog'
 
 @inject()
 export default class LocksController {
@@ -75,6 +76,7 @@ export default class LocksController {
    * @responseBody 401 - {"errors": [{"message": "Unauthorized access" }]}
    * @responseBody 403 - {"errors": [{ "code": "E_ROW_NOT_FOUND", "message": "You can`t do it." }]}
    */
+  @userlogMethod('Lock', 'id')
   async show({ request, response, auth }: HttpContext) {
     const authUser = auth.use('api').user
     if (!authUser || authUser.role > 2) {
@@ -83,10 +85,12 @@ export default class LocksController {
       })
     }
 
-    const lock = await this.lockService.poll({
+    const data = await pollLockValidator.validate({
       ticket: request.param('id'),
       owner: authUser.email,
     })
+
+    const lock = await this.lockService.poll(data)
     return lock
   }
 }
